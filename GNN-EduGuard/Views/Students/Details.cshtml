@@ -1,0 +1,203 @@
+@model GNN_EduGuard.Models.RiskPredictionDetail
+@{
+    var sv = Model.Student;
+    ViewData["Title"] = $"Hồ sơ học tập - {sv.FullName}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-2">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+        <h3 class="fw-bold mb-0">Hồ sơ Học tập & Phân tích Giải thích (XAI)</h3>
+    </div>
+    <div>
+        <form method="post" asp-action="ReEvaluate" asp-route-id="@sv.Id" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-arrow-clockwise me-1"></i> Đánh giá lại bằng GNN
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Student Info & GNN Score Card -->
+    <div class="col-lg-4">
+        <!-- Student Info -->
+        <div class="card p-3 mb-4">
+            <div class="text-center py-3">
+                <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex p-3 mb-3">
+                    <i class="bi bi-person-fill fs-1"></i>
+                </div>
+                <h4 class="fw-bold mb-1">@sv.FullName</h4>
+                <div class="badge bg-light text-dark border px-3 py-1 mb-2">@sv.StudentCode - @sv.ClassName</div>
+                <p class="text-muted small mb-0"><i class="bi bi-envelope me-1"></i>@sv.Email</p>
+            </div>
+
+            <hr class="my-2" />
+
+            <div class="py-2">
+                <div class="d-flex justify-content-between py-1 small">
+                    <span class="text-muted">Giới tính / Tuổi:</span>
+                    <span class="fw-semibold">@sv.Gender / @sv.Age tuổi</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 small">
+                    <span class="text-muted">GPA tích lũy:</span>
+                    <span class="fw-semibold text-primary">@sv.GpaBefore.ToString("F2") / 4.0</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 small">
+                    <span class="text-muted">Tổng clicks VLE:</span>
+                    <span class="fw-semibold">@sv.TotalVleClicks clicks</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 small">
+                    <span class="text-muted">Tỷ lệ nộp bài trễ:</span>
+                    <span class="fw-semibold text-danger">@((int)(sv.LateSubmissionRate * 100))%</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 small">
+                    <span class="text-muted">Điểm TB Assignment:</span>
+                    <span class="fw-semibold">@sv.AssignmentAverageScore.ToString("F1") / 100</span>
+                </div>
+                <div class="d-flex justify-content-between py-1 small">
+                    <span class="text-muted">Lần cập nhật AI cuối:</span>
+                    <span class="fw-semibold">@sv.LastEvaluatedAt.ToString("HH:mm dd/MM/yyyy")</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Prediction Gauge Card -->
+        <div class="card p-3 @(sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.HighRisk ? "border-danger" : "border-primary")">
+            <h6 class="fw-bold text-uppercase small text-muted mb-2">Kết quả dự đoán mô hình GNN</h6>
+            <div class="text-center py-2">
+                @{
+                    string riskTextColor = sv.RiskLevel switch {
+                        GNN_EduGuard.Models.RiskLevel.HighRisk => "text-danger",
+                        GNN_EduGuard.Models.RiskLevel.Moderate => "text-warning",
+                        _ => "text-success"
+                    };
+                    string riskBadgeText = sv.RiskLevel switch {
+                        GNN_EduGuard.Models.RiskLevel.HighRisk => "CẢNH BÁO NGUY CƠ CAO",
+                        GNN_EduGuard.Models.RiskLevel.Moderate => "CẦN LƯU Ý",
+                        _ => "AN TOÀN"
+                    };
+                }
+                <div class="display-4 fw-bold @riskTextColor">
+                    @((int)(sv.RiskProbability * 100))<span class="fs-4">%</span>
+                </div>
+                <span class="badge @(sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.HighRisk ? "badge-high-risk" : (sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.Moderate ? "badge-moderate" : "badge-safe")) px-3 py-2 rounded-pill mt-2">
+                    @riskBadgeText
+                </span>
+            </div>
+            <div class="alert alert-light border small mt-3 mb-0">
+                <i class="bi bi-info-circle text-primary me-1"></i>
+                Dự đoán tính toán dựa trên ma trận quan hệ đa nút (Heterogeneous Message Passing) giữa Sinh viên - Bài học VLE - Bài tập.
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Explainable AI & Recommendations -->
+    <div class="col-lg-8">
+        <!-- Radar Chart & Feature Distribution -->
+        <div class="card p-3 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-diagram-2 text-primary me-2"></i>Biểu đồ Radar Năng lực & Mức độ Tham gia</h5>
+            <div style="height: 280px;" class="d-flex justify-content-center align-items-center">
+                <canvas id="studentRadarChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Explainability (XAI) Reasons -->
+        <div class="card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">
+                    <i class="bi bi-lightbulb-fill text-warning me-2"></i>Giải thích Nguyên nhân (GNN Attention & SHAP)
+                </h5>
+                <span class="badge bg-light text-dark border">Tính minh bạch mô hình AI</span>
+            </div>
+
+            <div class="list-group list-group-flush">
+                @foreach (var exp in Model.Explanations)
+                {
+                    <div class="list-group-item px-0 py-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="fw-bold mb-1 @(exp.IsNegativeImpact ? "text-danger" : "text-success")">
+                                    <i class="bi @(exp.IsNegativeImpact ? "bi-arrow-up-circle-fill text-danger" : "bi-check-circle-fill text-success") me-1"></i>
+                                    @exp.FeatureName
+                                </h6>
+                                <p class="text-muted small mb-0">@exp.Description</p>
+                            </div>
+                            <span class="badge @(exp.IsNegativeImpact ? "bg-danger-subtle text-danger" : "bg-success-subtle text-success") border">
+                                Tác động: @(exp.ImpactScore > 0 ? "+" : "")@exp.ImpactScore.ToString("F2")
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Recommended Interventions -->
+        <div class="card p-3 border-info-subtle bg-light-subtle">
+            <h5 class="fw-bold text-primary mb-3">
+                <i class="bi bi-shield-check me-2"></i>Đề xuất Can thiệp Học vụ (Actionable Recommendations)
+            </h5>
+            <ul class="mb-0 ps-3">
+                @foreach (var action in Model.RecommendedActions)
+                {
+                    <li class="py-1">@action</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const ctxRadar = document.getElementById('studentRadarChart').getContext('2d');
+    
+    // Chuẩn hóa điểm số theo thang 100 để vẽ radar chart
+    const vleNormalized = Math.min(100, Math.round((@sv.TotalVleClicks / 500) * 100));
+    const gpaNormalized = Math.round((@sv.GpaBefore / 4.0) * 100);
+    const onTimeSubmissionRate = Math.round((1 - @sv.LateSubmissionRate) * 100);
+    const scoreNormalized = Math.round(@sv.AssignmentAverageScore);
+
+    new Chart(ctxRadar, {
+        type: 'radar',
+        data: {
+            labels: ['Tương tác VLE', 'GPA tích lũy', 'Nộp bài đúng hạn', 'Điểm Assignment', 'Tính tích cực'],
+            datasets: [
+                {
+                    label: '@sv.FullName',
+                    data: [vleNormalized, gpaNormalized, onTimeSubmissionRate, scoreNormalized, Math.round((1 - @sv.RiskProbability) * 100)],
+                    fill: true,
+                    backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                    borderColor: '#2563eb',
+                    pointBackgroundColor: '#2563eb',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#2563eb'
+                },
+                {
+                    label: 'Mức trung bình nhóm an toàn',
+                    data: [75, 80, 90, 85, 85],
+                    fill: true,
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    borderColor: '#22c55e',
+                    borderDash: [5, 5],
+                    pointBackgroundColor: '#22c55e',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    angleLines: { display: true },
+                    suggestedMin: 0,
+                    suggestedMax: 100
+                }
+            }
+        }
+    });
+</script>
+}

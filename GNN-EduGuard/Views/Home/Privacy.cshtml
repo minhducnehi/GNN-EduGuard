@@ -1,0 +1,33 @@
+@{
+    ViewData["Title"] = "Giới thiệu Hệ thống GNN EduGuard";
+}
+
+<div class="card p-4">
+    <h3 class="fw-bold mb-3"><i class="bi bi-diagram-3 text-primary me-2"></i>Hệ thống GNN EduGuard</h3>
+    <p class="lead text-muted">
+        Dự án nghiên cứu và phát triển hệ thống phát hiện sớm nguy cơ trượt môn / bỏ học của sinh viên bằng đồ thị tương tác học tập và mạng nơ-ron đồ thị dị thể (Heterogeneous GNN).
+    </p>
+
+    <hr class="my-4" />
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <h5 class="fw-bold text-primary"><i class="bi bi-cpu me-2"></i>Mô hình GNN (HGT / HeteroGAT)</h5>
+            <p class="text-muted small">
+                Xây dựng đồ thị dị thể kết nối đa thực thể: Sinh viên (Student), Môn học (Course), Hoạt động học liệu (Lesson VLE) và Bài tập (Assignment). Message Passing giúp học được hành vi tương tác toàn diện thay vì bảng dữ liệu phẳng truyền thống.
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h5 class="fw-bold text-success"><i class="bi bi-lightbulb me-2"></i>Tính minh bạch & Giải thích (XAI)</h5>
+            <p class="text-muted small">
+                Không chỉ đưa ra xác suất rủi ro, hệ thống tích hợp cơ chế GNNExplainer và SHAP để chỉ rõ nguyên nhân vì sao sinh viên bị cảnh báo (thiếu click VLE, điểm assignment thấp, hay nộp muộn).
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h5 class="fw-bold text-info"><i class="bi bi-layers me-2"></i>Kiến trúc ASP.NET Core MVC</h5>
+            <p class="text-muted small">
+                Tổ chức mã nguồn theo mô hình 3 lớp chuẩn Model - View - Controller: Model quản lý dữ liệu và DTO, View hiển thị giao diện báo cáo tương tác, Controller điều hướng và tích hợp dự đoán AI.
+            </p>
+        </div>
+    </div>
+</div>
