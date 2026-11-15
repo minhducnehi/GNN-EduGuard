@@ -12,6 +12,7 @@ namespace GNN_EduGuard.Data
 
         public DbSet<Student> Students { get; set; } = null!;
         public DbSet<Course> Courses { get; set; } = null!;
+        public DbSet<InterventionLog> InterventionLogs { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

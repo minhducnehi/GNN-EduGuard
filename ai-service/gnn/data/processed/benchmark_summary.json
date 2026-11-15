@@ -1,0 +1,44 @@
+{
+  "Logistic Regression": {
+    "f1_macro": 0.9754,
+    "f1_risk": 0.9831,
+    "recall_risk": 1.0,
+    "precision_risk": 0.9667,
+    "auc_roc": 1.0,
+    "threshold": 0.48,
+    "cv_auc": 0.98
+  },
+  "Random Forest": {
+    "f1_macro": 0.9527,
+    "f1_risk": 0.9643,
+    "recall_risk": 0.931,
+    "precision_risk": 1.0,
+    "auc_roc": 0.9978,
+    "threshold": 0.55,
+    "cv_auc": 0.9825
+  },
+  "Gradient Boosting": {
+    "f1_macro": 0.95,
+    "f1_risk": 0.9667,
+    "recall_risk": 1.0,
+    "precision_risk": 0.9355,
+    "auc_roc": 0.9957,
+    "threshold": 0.3,
+    "cv_auc": 0.9791
+  },
+  "HGT (HeteroGNN)": {
+    "f1_macro": 0.8804,
+    "f1_risk": 0.9123,
+    "recall_risk": 0.8966,
+    "precision_risk": 0.9286,
+    "auc_roc": 0.9741,
+    "threshold": 0.41
+  },
+  "HGT + LSTM (Temporal)": {
+    "f1_macro": 0.8963,
+    "f1_risk": 0.9355,
+    "recall_risk": 1.0,
+    "precision_risk": 0.8788,
+    "auc_roc": 0.9892
+  }
+}

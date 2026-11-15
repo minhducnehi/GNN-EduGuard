@@ -1,30 +1,52 @@
 @model GNN_EduGuard.Models.RiskPredictionDetail
 @{
     var sv = Model.Student;
+    var isStudentView = User.IsInRole("Student");
+    var attPercent = (int)(sv.AttendanceRate * 100);
     ViewData["Title"] = $"Hồ sơ học tập - {sv.FullName}";
+    var trajWeeks = Model.EarlyWarningTrajectory.Any()
+        ? string.Join(",", Model.EarlyWarningTrajectory.Select(t => $"'Tuần {t.Week}'"))
+        : "'Tuần 2','Tuần 4','Tuần 8','Tuần 12','Tuần 16'";
+    var trajScores = Model.EarlyWarningTrajectory.Any()
+        ? string.Join(",", Model.EarlyWarningTrajectory.Select(t => Math.Round(t.RiskScore * 100, 1).ToString(System.Globalization.CultureInfo.InvariantCulture)))
+        : "45,52,60,68,74";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
     <div>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-2">
-            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
-        </a>
-        <h3 class="fw-bold mb-0">Hồ sơ Học tập & Phân tích Giải thích (XAI)</h3>
+        @if (!isStudentView)
+        {
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-2">
+                <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+            </a>
+        }
+        <h3 class="fw-bold mb-0">
+            @(isStudentView ? "Lộ trình Học tập, Điểm danh & Gợi ý Ôn tập Cá nhân" : "Hồ sơ Điểm danh, Đồ thị GNN & Trợ lý AI Cố vấn (XAI + RAG)")
+        </h3>
     </div>
-    <div>
-        <form method="post" asp-action="ReEvaluate" asp-route-id="@sv.Id" class="d-inline">
-            @Html.AntiForgeryToken()
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-arrow-clockwise me-1"></i> Đánh giá lại bằng GNN
-            </button>
-        </form>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="mailto:@(sv.Email)?subject=H%E1%BB%97%20tr%E1%BB%A3%20chuy%C3%AAn%20c%E1%BA%A7n%20%26%20l%E1%BB%99%20tr%C3%ACnh%20h%E1%BB%8Dc%20t%E1%BA%ADp%20-%20@(sv.StudentCode)&body=Ch%C3%A0o%20em%20@(sv.FullName)%2C%0A%0ATh%E1%BA%A7y%2FC%C3%B4%20m%E1%BB%9Di%20em%20trao%20%C4%91%E1%BB%95i%20ng%E1%BA%AFn%2015%20ph%C3%BAt%20trong%20tu%E1%BA%A7n%20n%C3%A0y%20%C4%91%E1%BB%83%20h%E1%BB%97%20tr%E1%BB%A3%20em%20v%E1%BB%81%20ti%E1%BA%BFn%20%C4%91%E1%BB%99%20chuy%C3%AAn%20c%E1%BA%A7n%20v%C3%A0%20b%C3%A0i%20t%E1%BA%ADp%20m%C3%B4n%20h%E1%BB%8Dc%20nh%C3%A9!"
+           class="btn btn-outline-primary">
+            <i class="bi bi-envelope-paper me-1"></i> Gửi Email Hỗ trợ
+        </a>
+        <button type="button" id="btnConsultAgent" onclick="runAgentConsultation(@sv.Id)" class="btn btn-outline-primary">
+            <i class="bi bi-robot me-1"></i> AI Agent Tư vấn (Obsidian RAG)
+        </button>
+        @if (!isStudentView)
+        {
+            <form method="post" asp-action="ReEvaluate" asp-route-id="@sv.Id" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Đánh giá lại bằng GNN
+                </button>
+            </form>
+        }
     </div>
 </div>
 
 <div class="row g-4">
-    <!-- Left Column: Student Info & GNN Score Card -->
+    <!-- Left Column: Student Info, Attendance Control, GNN Score Card & Weak Concepts -->
     <div class="col-lg-4">
-        <!-- Student Info -->
         <div class="card p-3 mb-4">
             <div class="text-center py-3">
                 <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex p-3 mb-3">
@@ -38,9 +60,17 @@
             <hr class="my-2" />
 
             <div class="py-2">
+                <div class="d-flex justify-content-between align-items-center py-1 small">
+                    <span class="text-muted">Điểm danh (9 buổi/kỳ):</span>
+                    <span class="fw-bold @(sv.IsExamBanRisk ? "text-danger" : (sv.AbsentSessions == 1 ? "text-warning-emphasis" : "text-success"))">
+                        @sv.AttendedSessions/@sv.TotalSessions buổi (@attPercent%)
+                    </span>
+                </div>
                 <div class="d-flex justify-content-between py-1 small">
-                    <span class="text-muted">Giới tính / Tuổi:</span>
-                    <span class="fw-semibold">@sv.Gender / @sv.Age tuổi</span>
+                    <span class="text-muted">Số buổi vắng trên lớp:</span>
+                    <span class="fw-semibold @(sv.IsExamBanRisk ? "text-danger" : "text-dark")">
+                        @sv.AbsentSessions buổi @(sv.IsExamBanRisk ? "(Vượt >20% cấm thi)" : "(Cho phép tối đa 1 buổi)")
+                    </span>
                 </div>
                 <div class="d-flex justify-content-between py-1 small">
                     <span class="text-muted">GPA tích lũy:</span>
@@ -63,11 +93,64 @@
                     <span class="fw-semibold">@sv.LastEvaluatedAt.ToString("HH:mm dd/MM/yyyy")</span>
                 </div>
             </div>
+
+            <!-- Interactive Class Attendance Updater for Lecturer / Advisor -->
+            @if (!isStudentView)
+            {
+                <hr class="my-2" />
+                <div class="bg-light p-3 rounded border">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small fw-bold text-dark">
+                            <i class="bi bi-calendar2-check-fill text-primary me-1"></i>Cập nhật Điểm danh & Dự báo GNN
+                        </span>
+                        <span class="badge @(sv.IsExamBanRisk ? "bg-danger" : "bg-success")">
+                            @(sv.IsExamBanRisk ? "Nguy cơ cấm thi" : "Đủ ĐK dự thi")
+                        </span>
+                    </div>
+
+                    <form asp-controller="Students" asp-action="UpdateAttendance" method="post" class="mb-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="studentId" value="@sv.Id" />
+                        <input type="hidden" name="totalSessions" value="@sv.TotalSessions" />
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text">Số buổi có mặt</span>
+                            <input type="number" name="attendedSessions" class="form-control fw-bold text-center" min="0" max="@sv.TotalSessions" value="@sv.AttendedSessions" />
+                            <span class="input-group-text">/ @sv.TotalSessions buổi</span>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-cpu me-1"></i> Dự báo lại
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="d-flex gap-2">
+                        <form asp-controller="Students" asp-action="UpdateAttendance" method="post" class="flex-grow-1">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="studentId" value="@sv.Id" />
+                            <input type="hidden" name="totalSessions" value="@sv.TotalSessions" />
+                            <input type="hidden" name="attendedSessions" value="@Math.Max(0, sv.AttendedSessions - 1)" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm w-100" @(sv.AttendedSessions <= 0 ? "disabled" : "")>
+                                <i class="bi bi-person-dash me-1"></i> Ghi Vắng (+1 vắng)
+                            </button>
+                        </form>
+                        <form asp-controller="Students" asp-action="UpdateAttendance" method="post" class="flex-grow-1">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="studentId" value="@sv.Id" />
+                            <input type="hidden" name="totalSessions" value="@sv.TotalSessions" />
+                            <input type="hidden" name="attendedSessions" value="@Math.Min(sv.TotalSessions, sv.AttendedSessions + 1)" />
+                            <button type="submit" class="btn btn-outline-success btn-sm w-100" @(sv.AttendedSessions >= sv.TotalSessions ? "disabled" : "")>
+                                <i class="bi bi-person-check me-1"></i> Điểm danh Có mặt (+1)
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
         </div>
 
         <!-- Risk Prediction Gauge Card -->
-        <div class="card p-3 @(sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.HighRisk ? "border-danger" : "border-primary")">
-            <h6 class="fw-bold text-uppercase small text-muted mb-2">Kết quả dự đoán mô hình GNN</h6>
+        <div class="card p-3 mb-4 @(sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.HighRisk ? "border-danger" : "border-primary")">
+            <h6 class="fw-bold text-uppercase small text-muted mb-2">
+                @(isStudentView ? "Chỉ số Cần Hỗ trợ Học tập & Chuyên cần" : "Dự đoán Mô hình Fair HGT + Điểm danh + LSTM")
+            </h6>
             <div class="text-center py-2">
                 @{
                     string riskTextColor = sv.RiskLevel switch {
@@ -75,11 +158,17 @@
                         GNN_EduGuard.Models.RiskLevel.Moderate => "text-warning",
                         _ => "text-success"
                     };
-                    string riskBadgeText = sv.RiskLevel switch {
-                        GNN_EduGuard.Models.RiskLevel.HighRisk => "CẢNH BÁO NGUY CƠ CAO",
-                        GNN_EduGuard.Models.RiskLevel.Moderate => "CẦN LƯU Ý",
-                        _ => "AN TOÀN"
-                    };
+                    string riskBadgeText = isStudentView
+                        ? (sv.RiskLevel switch {
+                            GNN_EduGuard.Models.RiskLevel.HighRisk => "CẦN ƯU TIÊN ĐI HỌC ĐẦY ĐỦ & ÔN TẬP SỚM",
+                            GNN_EduGuard.Models.RiskLevel.Moderate => "CẦN DUY TRÌ CHUYÊN CẦN & TIẾN ĐỘ",
+                            _ => "CHUYÊN CẦN & TIẾN ĐỘ HỌC TẬP TỐT"
+                        })
+                        : (sv.RiskLevel switch {
+                            GNN_EduGuard.Models.RiskLevel.HighRisk => "NGUY CƠ CAO (>= 70%)",
+                            GNN_EduGuard.Models.RiskLevel.Moderate => "CẦN LƯU Ý (40% - 69%)",
+                            _ => "AN TOÀN (< 40%)"
+                        });
                 }
                 <div class="display-4 fw-bold @riskTextColor">
                     @((int)(sv.RiskProbability * 100))<span class="fs-4">%</span>
@@ -88,30 +177,126 @@
                     @riskBadgeText
                 </span>
             </div>
+            @if (Model.WeakConcepts.Any())
+            {
+                <hr class="my-3" />
+                <div class="small fw-bold text-danger mb-2">
+                    <i class="bi bi-journal-bookmark-fill me-1"></i>Chủ đề kiến thức cần ưu tiên ôn tập (Concept Nodes):
+                </div>
+                <div class="d-flex flex-wrap gap-1">
+                    @foreach (var concept in Model.WeakConcepts)
+                    {
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle text-wrap text-start">@concept</span>
+                    }
+                </div>
+            }
             <div class="alert alert-light border small mt-3 mb-0">
-                <i class="bi bi-info-circle text-primary me-1"></i>
-                Dự đoán tính toán dựa trên ma trận quan hệ đa nút (Heterogeneous Message Passing) giữa Sinh viên - Bài học VLE - Bài tập.
+                <i class="bi bi-shield-check text-success me-1"></i>
+                <strong>Fairness AI:</strong> Mô hình đánh giá trên 7 đặc trưng chuyên cần, điểm số & hành vi tương tác (không sử dụng giới tính hay nhân khẩu học).
             </div>
+        </div>
+
+        <!-- Recommended Interventions -->
+        <div class="card p-3 border-info-subtle bg-light-subtle mb-4">
+            <h6 class="fw-bold text-primary mb-2">
+                <i class="bi bi-check2-circle me-1"></i>Gợi ý Hành động Cụ thể (Actionable Checklist)
+            </h6>
+            <ul class="small mb-0 ps-3">
+                @foreach (var action in Model.RecommendedActions)
+                {
+                    <li class="py-1">@action</li>
+                }
+            </ul>
         </div>
     </div>
 
-    <!-- Right Column: Explainable AI & Recommendations -->
+    <!-- Right Column: Charts, Subgraph XAI, Feature Attributions, Local AI Agent & Intervention Log -->
     <div class="col-lg-8">
-        <!-- Radar Chart & Feature Distribution -->
-        <div class="card p-3 mb-4">
-            <h5 class="fw-bold mb-3"><i class="bi bi-diagram-2 text-primary me-2"></i>Biểu đồ Radar Năng lực & Mức độ Tham gia</h5>
-            <div style="height: 280px;" class="d-flex justify-content-center align-items-center">
-                <canvas id="studentRadarChart"></canvas>
+        <!-- Row of 2 Charts: Radar & Early Warning Trajectory -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="card p-3 h-100">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-diagram-2 text-primary me-1"></i>Biểu đồ Radar Năng lực & Điểm danh</h6>
+                    <div style="height: 240px;" class="d-flex justify-content-center align-items-center">
+                        <canvas id="studentRadarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3 h-100">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-graph-up-arrow text-danger me-1"></i>Dự báo Sớm Theo Tuần (Causal LSTM + HGT)</h6>
+                    <div style="height: 240px;" class="d-flex justify-content-center align-items-center">
+                        <canvas id="earlyWarningChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Explainability (XAI) Reasons -->
+        <!-- Local AI Agent Consultation Panel (Qwen 2.5 3B + Obsidian RAG) -->
+        <div class="card p-3 mb-4" style="border-color: rgba(0, 153, 255, 0.35);" id="agentPanelCard">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="fw-bold text-primary mb-0">
+                    <i class="bi bi-robot me-2"></i>Cố vấn Học tập AI Local (Qwen 2.5 3B + Obsidian Vault RAG)
+                </h5>
+                <span class="badge eg-badge-normal px-2 py-1 rounded-pill">100% Local Privacy</span>
+            </div>
+            <p class="text-muted small mb-3">
+                Kết hợp kết quả <strong>Điểm danh trên lớp (@sv.AttendedSessions/@sv.TotalSessions buổi)</strong> + <strong>GNNExplainer</strong> và tra cứu ngữ nghĩa <strong>ChromaDB (Obsidian Knowledge Vault)</strong> để lập lộ trình hỗ trợ chuẩn quy chế đào tạo.
+            </p>
+
+            <div id="agentSourcesBox" class="mb-2 d-none">
+                <span class="small fw-semibold text-muted me-1">Tài liệu Obsidian đã trích xuất:</span>
+                <span id="agentSourcesBadges"></span>
+            </div>
+
+            <div id="agentOutputBox" class="p-3 bg-light rounded border small mb-3" style="white-space: pre-wrap; max-height: 360px; overflow-y: auto;">Nhấn nút "AI Agent Tư vấn (Obsidian RAG)" phía trên hoặc đặt câu hỏi bên dưới để Trợ lý AI phân tích tình trạng chuyên cần (@attPercent%) và lộ trình hỗ trợ cho @sv.FullName.</div>
+
+            <div class="input-group">
+                <input type="text" id="agentChatInput" class="form-control form-control-sm" placeholder="Hỏi thêm AI Agent về quy định cấm thi điểm danh (<80%), lộ trình học bù cho @sv.FullName..." />
+                <button class="btn btn-outline-success btn-sm" type="button" onclick="sendCustomAgentQuestion()">
+                    <i class="bi bi-send me-1"></i> Gửi câu hỏi
+                </button>
+            </div>
+        </div>
+
+        <!-- 2-Hop Subgraph Explanations + Attendance Regulation -->
+        @if (Model.SubgraphExplanations.Any())
+        {
+            <div class="card p-3 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-share-fill text-primary me-2"></i>Giải thích Đồ thị Con 2-Hop & Quy chế Điểm danh
+                    </h5>
+                    <span class="badge bg-primary-subtle text-primary border">Subgraph & Attendance XAI</span>
+                </div>
+                <div class="list-group list-group-flush">
+                    @foreach (var edge in Model.SubgraphExplanations)
+                    {
+                        <div class="list-group-item px-0 py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-dark font-monospace me-2">@edge.AssignmentNode</span>
+                                    <i class="bi bi-arrow-right text-muted me-2"></i>
+                                    <span class="badge bg-warning-subtle text-dark border">@edge.ConceptNode</span>
+                                    <div class="small text-muted mt-1">@edge.Explanation</div>
+                                </div>
+                                <span class="badge bg-danger-subtle text-danger border">
+                                    ΔRisk: +@((edge.RiskContribution * 100).ToString("F1"))%
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Explainability (XAI) Feature Attributions -->
         <div class="card p-3 mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0">
-                    <i class="bi bi-lightbulb-fill text-warning me-2"></i>Giải thích Nguyên nhân (GNN Attention & SHAP)
+                    <i class="bi bi-lightbulb-fill text-warning me-2"></i>Giải thích 7 Đặc trưng Nút (Gradient × Counterfactual XAI)
                 </h5>
-                <span class="badge bg-light text-dark border">Tính minh bạch mô hình AI</span>
+                <span class="badge bg-light text-dark border">Đối chiếu chuẩn nhóm an toàn</span>
             </div>
 
             <div class="list-group list-group-flush">
@@ -135,17 +320,66 @@
             </div>
         </div>
 
-        <!-- Recommended Interventions -->
-        <div class="card p-3 border-info-subtle bg-light-subtle">
-            <h5 class="fw-bold text-primary mb-3">
-                <i class="bi bi-shield-check me-2"></i>Đề xuất Can thiệp Học vụ (Actionable Recommendations)
-            </h5>
-            <ul class="mb-0 ps-3">
-                @foreach (var action in Model.RecommendedActions)
+        <!-- Intervention Log & Tracking (Actionable Loop) -->
+        <div class="card p-3 border-primary-subtle">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-primary mb-0">
+                    <i class="bi bi-journal-check me-2"></i>Nhật ký Can thiệp & Đồng hành Học vụ
+                </h5>
+                <span class="badge bg-primary-subtle text-primary border">@Model.InterventionHistory.Count bản ghi</span>
+            </div>
+
+            @if (!isStudentView)
+            {
+                <form asp-controller="Students" asp-action="AddIntervention" method="post" class="mb-3 p-3 bg-light rounded border">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="studentId" value="@sv.Id" />
+                    <div class="row g-2 mb-2">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold mb-1">Hình thức hỗ trợ</label>
+                            <select name="actionType" class="form-select form-select-sm">
+                                <option value="Nhắc nhở Điểm danh Chuyên cần">Nhắc nhở Điểm danh Chuyên cần</option>
+                                <option value="Tư vấn trực tiếp 1-1">Tư vấn trực tiếp 1-1</option>
+                                <option value="Gửi Email & Nhắc nhở LMS">Gửi Email & Nhắc nhở LMS</option>
+                                <option value="Ghép cặp Peer-Tutoring">Ghép cặp bạn học (Peer-Tutoring)</option>
+                                <option value="Gia hạn nộp bù bài tập">Gia hạn nộp bù bài tập</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label small fw-semibold mb-1">Ghi chú kết quả & cam kết của sinh viên</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="interventionNotesInput" name="notes" class="form-control" placeholder="Nhập nội dung tư vấn hoặc nhấn 'Chép từ AI Agent'..." required />
+                                <button type="button" class="btn btn-outline-secondary" onclick="copyAgentPlanToNotes()">
+                                    <i class="bi bi-clipboard-check"></i> Chép từ AI
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save me-1"></i> Lưu nhật ký
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            }
+
+            <div class="list-group list-group-flush">
+                @if (!Model.InterventionHistory.Any())
                 {
-                    <li class="py-1">@action</li>
+                    <div class="text-muted small py-2">Chưa có bản ghi can thiệp nào cho sinh viên này.</div>
                 }
-            </ul>
+                @foreach (var log in Model.InterventionHistory)
+                {
+                    <div class="list-group-item px-0 py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold small text-dark">
+                                <i class="bi bi-person-check-fill text-success me-1"></i>@log.AdvisorName
+                                <span class="badge bg-info-subtle text-dark border ms-1">@log.ActionType</span>
+                            </span>
+                            <small class="text-muted">@log.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                        </div>
+                        <div class="small text-secondary mt-1">@log.Notes</div>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>
@@ -153,8 +387,7 @@
 @section Scripts {
 <script>
     const ctxRadar = document.getElementById('studentRadarChart').getContext('2d');
-    
-    // Chuẩn hóa điểm số theo thang 100 để vẽ radar chart
+    const attendanceNormalized = @attPercent;
     const vleNormalized = Math.min(100, Math.round((@sv.TotalVleClicks / 500) * 100));
     const gpaNormalized = Math.round((@sv.GpaBefore / 4.0) * 100);
     const onTimeSubmissionRate = Math.round((1 - @sv.LateSubmissionRate) * 100);
@@ -163,27 +396,56 @@
     new Chart(ctxRadar, {
         type: 'radar',
         data: {
-            labels: ['Tương tác VLE', 'GPA tích lũy', 'Nộp bài đúng hạn', 'Điểm Assignment', 'Tính tích cực'],
+            labels: ['Điểm danh trên lớp', 'Tương tác VLE', 'GPA tích lũy', 'Nộp bài đúng hạn', 'Điểm Assignment', 'Độ an toàn'],
             datasets: [
                 {
-                    label: '@sv.FullName',
-                    data: [vleNormalized, gpaNormalized, onTimeSubmissionRate, scoreNormalized, Math.round((1 - @sv.RiskProbability) * 100)],
+                    label: '@Html.Raw(sv.FullName)',
+                    data: [attendanceNormalized, vleNormalized, gpaNormalized, onTimeSubmissionRate, scoreNormalized, Math.round((1 - @sv.RiskProbability.ToString(System.Globalization.CultureInfo.InvariantCulture)) * 100)],
                     fill: true,
-                    backgroundColor: 'rgba(37, 99, 235, 0.2)',
-                    borderColor: '#2563eb',
-                    pointBackgroundColor: '#2563eb',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#2563eb'
+                    backgroundColor: 'rgba(0, 153, 255, 0.16)',
+                    borderColor: '#0099FF',
+                    pointBackgroundColor: '#0099FF'
                 },
                 {
-                    label: 'Mức trung bình nhóm an toàn',
-                    data: [75, 80, 90, 85, 85],
+                    label: 'Chuẩn an toàn (>=80% điểm danh)',
+                    data: [85, 75, 80, 90, 85, 85],
                     fill: true,
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    borderColor: '#22c55e',
-                    borderDash: [5, 5],
-                    pointBackgroundColor: '#22c55e',
+                    backgroundColor: 'rgba(15, 23, 42, 0.05)',
+                    borderColor: '#64748B',
+                    borderDash: [5, 5]
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { r: { suggestedMin: 0, suggestedMax: 100 } }
+        }
+    });
+
+    const ctxEW = document.getElementById('earlyWarningChart').getContext('2d');
+    new Chart(ctxEW, {
+        type: 'line',
+        data: {
+            labels: [@Html.Raw(trajWeeks)],
+            datasets: [
+                {
+                    label: 'Xác suất Nguy cơ (%)',
+                    data: [@Html.Raw(trajScores)],
+                    borderColor: '#F42902',
+                    backgroundColor: 'rgba(244, 41, 2, 0.10)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#F42902'
+                },
+                {
+                    label: 'Ngưỡng Cảnh báo Cao (70%)',
+                    data: [70, 70, 70, 70, 70],
+                    borderColor: '#0099FF',
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    fill: false
                 }
             ]
         },
@@ -191,13 +453,68 @@
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                r: {
-                    angleLines: { display: true },
-                    suggestedMin: 0,
-                    suggestedMax: 100
-                }
+                y: { min: 0, max: 100, title: { display: true, text: 'Risk (%)' } }
             }
         }
     });
+
+    function copyAgentPlanToNotes() {
+        const outBox = document.getElementById('agentOutputBox');
+        const notesInput = document.getElementById('interventionNotesInput');
+        if (outBox && notesInput) {
+            const text = outBox.textContent.trim();
+            notesInput.value = text.length > 220 ? text.substring(0, 220) + '...' : text;
+        }
+    }
+
+    async function runAgentConsultation(studentId) {
+        const btn = document.getElementById('btnConsultAgent');
+        const outBox = document.getElementById('agentOutputBox');
+        const srcBox = document.getElementById('agentSourcesBox');
+        const srcBadges = document.getElementById('agentSourcesBadges');
+
+        btn.disabled = true;
+        outBox.innerHTML = '<div class="text-primary mb-2"><span class="spinner-border spinner-border-sm me-2"></span>Đang truy vấn kết quả Điểm danh + đồ thị GNN, tìm kiếm Vector DB (Obsidian)...</div><div class="eg-skeleton mb-2" style="height: 14px; width: 85%;"></div><div class="eg-skeleton" style="height: 14px; width: 65%;"></div>';
+
+        try {
+            const resp = await fetch(`/api/predictionsapi/consult/${studentId}`, { method: 'POST' });
+            const data = await resp.json();
+            if (data.agent_consultation) {
+                outBox.textContent = data.agent_consultation.analysis_and_plan;
+                const sources = data.agent_consultation.retrieved_sources || [];
+                if (sources.length > 0) {
+                    srcBox.classList.remove('d-none');
+                    srcBadges.innerHTML = sources.map(s => `<span class="badge bg-secondary-subtle text-dark border me-1">${s}</span>`).join('');
+                }
+            } else {
+                outBox.textContent = JSON.stringify(data, null, 2);
+            }
+        } catch (err) {
+            outBox.textContent = 'Lỗi kết nối AI Service: ' + err.message;
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    async function sendCustomAgentQuestion() {
+        const input = document.getElementById('agentChatInput');
+        const outBox = document.getElementById('agentOutputBox');
+        const q = input.value.trim();
+        if (!q) return;
+
+        outBox.innerHTML = '<div class="text-primary mb-2"><span class="spinner-border spinner-border-sm me-2"></span>Local AI Agent đang suy luận câu trả lời...</div><div class="eg-skeleton" style="height: 14px; width: 75%;"></div>';
+        try {
+            const resp = await fetch('/api/predictionsapi/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `[Hồ sơ SV: @Html.Raw(sv.FullName), Điểm danh: @sv.AttendedSessions/@sv.TotalSessions buổi (@attPercent%), GPA: @sv.GpaBefore, Risk: @((int)(sv.RiskProbability*100))%] Câu hỏi: ${q}` })
+            });
+            const data = await resp.json();
+            outBox.textContent = data.reply || JSON.stringify(data);
+            input.value = '';
+        } catch (err) {
+            outBox.textContent = 'Lỗi kết nối AI Service: ' + err.message;
+        }
+    }
 </script>
 }

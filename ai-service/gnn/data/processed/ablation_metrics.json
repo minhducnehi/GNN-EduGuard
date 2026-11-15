@@ -1,0 +1,44 @@
+{
+  "1. Full Model (HGT + LSTM + Attendance)": {
+    "f1_macro": 0.8963,
+    "f1_risk": 0.9355,
+    "recall_risk": 1.0,
+    "precision_risk": 0.8788,
+    "auc_roc": 0.9892
+  },
+  "2. w/o Temporal Dynamics (Static HGT)": {
+    "f1_macro": 0.82,
+    "f1_risk": 0.84,
+    "recall_risk": 0.7241,
+    "precision_risk": 1.0,
+    "auc_roc": 0.9741
+  },
+  "3. w/o Class Attendance Features": {
+    "f1_macro": 0.7984,
+    "f1_risk": 0.8163,
+    "recall_risk": 0.6897,
+    "precision_risk": 1.0,
+    "auc_roc": 0.9289
+  },
+  "4. w/o Concept Nodes & Links": {
+    "f1_macro": 0.82,
+    "f1_risk": 0.84,
+    "recall_risk": 0.7241,
+    "precision_risk": 1.0,
+    "auc_roc": 0.9741
+  },
+  "5. w/o Assignment Submission Edges": {
+    "f1_macro": 0.7926,
+    "f1_risk": 0.871,
+    "recall_risk": 0.931,
+    "precision_risk": 0.8182,
+    "auc_roc": 0.9569
+  },
+  "6. w/o VLE Lesson Interaction Edges": {
+    "f1_macro": 0.8677,
+    "f1_risk": 0.9206,
+    "recall_risk": 1.0,
+    "precision_risk": 0.8529,
+    "auc_roc": 0.9871
+  }
+}

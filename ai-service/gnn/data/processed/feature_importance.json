@@ -1,0 +1,62 @@
+{
+  "model": "Random Forest (GridSearchCV-tuned)",
+  "method": "Permutation importance (ROC-AUC drop) on validation split; RF impurity importance for reference",
+  "features": [
+    {
+      "feature_key": "attendance_rate",
+      "feature_name": "Tỷ lệ điểm danh chuyên cần",
+      "rf_impurity_importance": 0.2499,
+      "permutation_importance": 0.068,
+      "permutation_std": 0.0237
+    },
+    {
+      "feature_key": "avg_score_norm",
+      "feature_name": "Điểm trung bình bài kiểm tra",
+      "rf_impurity_importance": 0.3304,
+      "permutation_importance": 0.0583,
+      "permutation_std": 0.0363
+    },
+    {
+      "feature_key": "total_clicks_norm",
+      "feature_name": "Tổng lượt tương tác VLE (clicks)",
+      "rf_impurity_importance": 0.2061,
+      "permutation_importance": 0.0205,
+      "permutation_std": 0.0149
+    },
+    {
+      "feature_key": "active_days_norm",
+      "feature_name": "Số ngày hoạt động trên VLE",
+      "rf_impurity_importance": 0.079,
+      "permutation_importance": -0.0006,
+      "permutation_std": 0.001
+    },
+    {
+      "feature_key": "num_of_prev_attempts",
+      "feature_name": "Số lần học lại trước đó",
+      "rf_impurity_importance": 0.0191,
+      "permutation_importance": -0.0026,
+      "permutation_std": 0.0046
+    },
+    {
+      "feature_key": "submission_rate",
+      "feature_name": "Tỷ lệ nộp bài tập",
+      "rf_impurity_importance": 0.0438,
+      "permutation_importance": -0.0044,
+      "permutation_std": 0.0027
+    },
+    {
+      "feature_key": "studied_credits_norm",
+      "feature_name": "Khối lượng tín chỉ đăng ký",
+      "rf_impurity_importance": 0.0079,
+      "permutation_importance": -0.0048,
+      "permutation_std": 0.0033
+    },
+    {
+      "feature_key": "late_submission_rate",
+      "feature_name": "Tỷ lệ nộp bài trễ hạn",
+      "rf_impurity_importance": 0.0638,
+      "permutation_importance": -0.006,
+      "permutation_std": 0.0044
+    }
+  ]
+}

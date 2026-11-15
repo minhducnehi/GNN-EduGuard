@@ -1,0 +1,135 @@
+@{
+    ViewData["Title"] = "Đăng nhập hệ thống";
+    var returnUrl = ViewBag.ReturnUrl as string;
+    var loginError = ViewBag.LoginError as string;
+}
+
+<div class="row justify-content-center align-items-center py-4" style="min-height: 82vh;">
+    <div class="col-md-10 col-lg-9 col-xl-8">
+        <div class="card border-0 shadow-lg overflow-hidden rounded-4">
+            <div class="row g-0">
+                <!-- Left: Login Form -->
+                <div class="col-md-6 p-4 p-lg-5 bg-white">
+                    <div class="d-flex align-items-center mb-4">
+                        <i class="bi bi-diagram-3-fill fs-2 text-primary me-2"></i>
+                        <div>
+                            <h4 class="fw-bold mb-0">GNN <span class="text-dark">EduGuard</span></h4>
+                            <small class="text-muted">Hệ thống Cảnh báo Sớm &amp; Cố vấn Học tập</small>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-1">Đăng nhập tài khoản</h5>
+                    <p class="text-muted small mb-4">Phân quyền 3 vai trò: Sinh viên, Giáo viên (theo lớp) &amp; Admin</p>
+
+                    @if (!string.IsNullOrEmpty(loginError))
+                    {
+                        <div class="alert alert-danger py-2 small d-flex align-items-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span>@loginError</span>
+                        </div>
+                    }
+
+                    <form method="post" asp-controller="Account" asp-action="Login" id="loginForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                        <div class="mb-3">
+                            <label for="usernameInput" class="form-label fw-semibold small">Tên đăng nhập</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-person text-primary"></i></span>
+                                <input type="text" id="usernameInput" name="username" class="form-control"
+                                       placeholder="Nhập tài khoản (vd: sv2380601, gv.cntta, admin)" required autofocus />
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="passwordInput" class="form-label fw-semibold small">Mật khẩu</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-lock text-primary"></i></span>
+                                <input type="password" id="passwordInput" name="password" class="form-control"
+                                       placeholder="Nhập mật khẩu" required />
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Đăng nhập
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right: Demo Accounts by 3 Roles -->
+                <div class="col-md-6 p-4 p-lg-5 bg-light border-start">
+                    <div class="fw-bold small text-uppercase text-primary mb-3">
+                        <i class="bi bi-shield-check me-1"></i> Tài khoản kiểm thử (Mật khẩu: <code>123456</code>)
+                    </div>
+
+                    <div class="d-flex flex-column gap-2">
+                        <!-- Admin -->
+                        <button type="button" class="btn btn-white border text-start p-2 rounded-3 quick-login-btn"
+                                data-user="admin" data-pass="123456">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-semibold small"><i class="bi bi-gear-fill text-danger me-1"></i> Admin (Phòng Đào tạo)</span>
+                                <span class="badge bg-danger-subtle text-danger">Toàn bộ hệ thống</span>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.76rem;">Tài khoản: <code>admin</code> &bull; Quản lý tất cả các lớp</div>
+                        </button>
+
+                        <!-- Teachers -->
+                        <button type="button" class="btn btn-white border text-start p-2 rounded-3 quick-login-btn"
+                                data-user="gv.cntta" data-pass="123456">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-semibold small"><i class="bi bi-person-workspace text-primary me-1"></i> GV. Nguyễn Minh Đức</span>
+                                <span class="badge bg-primary-subtle text-primary">Giáo viên</span>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.76rem;">Tài khoản: <code>gv.cntta</code> &bull; Lớp: <strong>CNTT-K23A, CNTT-K23B</strong></div>
+                        </button>
+
+                        <button type="button" class="btn btn-white border text-start p-2 rounded-3 quick-login-btn"
+                                data-user="gv.cnttc" data-pass="123456">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-semibold small"><i class="bi bi-person-workspace text-primary me-1"></i> GV. Lê Thị Hương</span>
+                                <span class="badge bg-primary-subtle text-primary">Giáo viên</span>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.76rem;">Tài khoản: <code>gv.cnttc</code> &bull; Lớp: <strong>CNTT-K23C</strong></div>
+                        </button>
+
+                        <!-- Students -->
+                        <button type="button" class="btn btn-white border text-start p-2 rounded-3 quick-login-btn"
+                                data-user="sv2380601" data-pass="123456">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-semibold small"><i class="bi bi-mortarboard-fill text-success me-1"></i> SV. Nguyễn Văn An</span>
+                                <span class="badge bg-success-subtle text-success">Sinh viên</span>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.76rem;">Tài khoản: <code>sv2380601</code> &bull; Chỉ xem chỉ số cá nhân (CNTT-K23A)</div>
+                        </button>
+
+                        <button type="button" class="btn btn-white border text-start p-2 rounded-3 quick-login-btn"
+                                data-user="sv2380606" data-pass="123456">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-semibold small"><i class="bi bi-mortarboard-fill text-success me-1"></i> SV. Võ Quốc Cường</span>
+                                <span class="badge bg-success-subtle text-success">Sinh viên</span>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.76rem;">Tài khoản: <code>sv2380606</code> &bull; Chỉ xem chỉ số cá nhân (CNTT-K23C)</div>
+                        </button>
+                    </div>
+
+                    <div class="text-muted mt-3" style="font-size: 0.75rem;">
+                        <i class="bi bi-hand-index-thumb me-1"></i> Bấm vào một thẻ tài khoản ở trên để tự điền và đăng nhập nhanh.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.quick-login-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('usernameInput').value = btn.getAttribute('data-user') || '';
+                document.getElementById('passwordInput').value = btn.getAttribute('data-pass') || '';
+                document.getElementById('loginForm').submit();
+            });
+        });
+    </script>
+}

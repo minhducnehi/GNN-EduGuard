@@ -1,14 +1,28 @@
-@model List<GNN_EduGuard.Models.Student>
+﻿@model List<GNN_EduGuard.Models.Student>
 @{
     ViewData["Title"] = "Danh sách Sinh viên";
     var currentFilter = ViewBag.CurrentFilter as GNN_EduGuard.Models.RiskLevel?;
     var currentSearch = ViewBag.CurrentSearch as string;
+    var smtpEmail = ViewBag.SmtpEmail as string ?? string.Empty;
+    var hasSmtpPassword = ViewBag.HasSmtpPassword as bool? ?? false;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
     <div>
-        <h3 class="fw-bold mb-1">Quản lý & Theo dõi Sinh viên</h3>
-        <p class="text-muted mb-0">Theo dõi điểm số, lượt click VLE và chỉ số nguy cơ dự đoán từ mô hình GNN</p>
+        <h3 class="fw-bold mb-1">Quản lý Điểm danh, Học tập &amp; Dự báo Nguy cơ Sinh viên</h3>
+        <p class="text-muted mb-0">Theo dõi kết quả điểm danh chuyên cần (tối thiểu 80%), điểm số, lượt tương tác VLE và dự báo từ mô hình Fair HGT</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <button type="button"
+                class="btn btn-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#bulkEmailModal"
+                disabled="@(!Model.Any())">
+            <i class="bi bi-envelope-exclamation-fill me-1"></i> Gửi Gmail Cảnh báo (@Model.Count SV)
+        </button>
+        <a asp-controller="Students" asp-action="ExportCsv" asp-route-search="@currentSearch" asp-route-riskFilter="@currentFilter" class="btn btn-outline-primary">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Xuất Báo cáo CSV (Excel)
+        </a>
     </div>
 </div>
 
@@ -17,38 +31,57 @@
     <form method="get" asp-controller="Students" asp-action="Index" class="row g-3 align-items-center">
         <div class="col-md-5">
             <div class="input-group">
-                <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" name="search" class="form-control" placeholder="Tìm theo Mã SV, Họ tên hoặc Lớp..." value="@currentSearch" />
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-primary"></i></span>
+                <input type="text" name="search" class="form-control border-start-0" placeholder="Tìm theo Mã SV, Họ tên hoặc Lớp..." value="@currentSearch" />
             </div>
         </div>
         <div class="col-md-4">
             <select name="riskFilter" class="form-select">
                 <option value="">-- Tất cả mức độ nguy cơ --</option>
-                <option value="HighRisk" selected="@(currentFilter == GNN_EduGuard.Models.RiskLevel.HighRisk)">Nguy cơ cao (> 70%)</option>
-                <option value="Moderate" selected="@(currentFilter == GNN_EduGuard.Models.RiskLevel.Moderate)">Nguy cơ vừa (40% - 70%)</option>
-                <option value="Safe" selected="@(currentFilter == GNN_EduGuard.Models.RiskLevel.Safe)">An toàn (< 40%)</option>
+                <option value="HighRisk" selected="@(currentFilter == GNN_EduGuard.Models.RiskLevel.HighRisk)">Nguy cơ cao (&gt;= 70%)</option>
+                <option value="Moderate" selected="@(currentFilter == GNN_EduGuard.Models.RiskLevel.Moderate)">Nguy cơ vừa (40% - 69%)</option>
+                <option value="Safe" selected="@(currentFilter == GNN_EduGuard.Models.RiskLevel.Safe)">An toàn (&lt; 40%)</option>
             </select>
         </div>
         <div class="col-md-3 d-flex gap-2">
             <button type="submit" class="btn btn-primary flex-grow-1">
                 <i class="bi bi-funnel me-1"></i> Lọc dữ liệu
             </button>
-            <a asp-controller="Students" asp-action="Index" class="btn btn-outline-secondary">
+            <a asp-controller="Students" asp-action="Index" class="btn btn-outline-secondary" title="Đặt lại bộ lọc">
                 <i class="bi bi-arrow-counterclockwise"></i>
             </a>
         </div>
     </form>
+    <div class="d-flex flex-wrap gap-2 mt-3 pt-3 border-top">
+        <a asp-controller="Students" asp-action="Index" asp-route-search="@currentSearch"
+           class="eg-filter-pill @(currentFilter == null ? "active" : "")">
+            <i class="bi bi-grid"></i> Tất cả
+        </a>
+        <a asp-controller="Students" asp-action="Index" asp-route-search="@currentSearch" asp-route-riskFilter="HighRisk"
+           class="eg-filter-pill eg-pill-alert @(currentFilter == GNN_EduGuard.Models.RiskLevel.HighRisk ? "active" : "")">
+            <i class="bi bi-exclamation-triangle-fill"></i> Nguy cơ cao
+        </a>
+        <a asp-controller="Students" asp-action="Index" asp-route-search="@currentSearch" asp-route-riskFilter="Moderate"
+           class="eg-filter-pill @(currentFilter == GNN_EduGuard.Models.RiskLevel.Moderate ? "active" : "")">
+            <i class="bi bi-dash-circle"></i> Nguy cơ vừa
+        </a>
+        <a asp-controller="Students" asp-action="Index" asp-route-search="@currentSearch" asp-route-riskFilter="Safe"
+           class="eg-filter-pill @(currentFilter == GNN_EduGuard.Models.RiskLevel.Safe ? "active" : "")">
+            <i class="bi bi-check-circle"></i> An toàn
+        </a>
+    </div>
 </div>
 
 <!-- Table Card -->
 <div class="card p-3">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
+            <thead>
                 <tr>
                     <th>Mã SV</th>
                     <th>Họ và tên</th>
                     <th>Lớp</th>
+                    <th>Điểm danh (Chuyên cần)</th>
                     <th>GPA trước</th>
                     <th>Clicks VLE</th>
                     <th>Nộp muộn</th>
@@ -61,9 +94,15 @@
                 @if (!Model.Any())
                 {
                     <tr>
-                        <td colspan="9" class="text-center py-4 text-muted">
-                            <i class="bi bi-emoji-neutral fs-2 d-block mb-2"></i>
-                            Không tìm thấy sinh viên nào phù hợp với điều kiện tìm kiếm.
+                        <td colspan="10" class="p-4 border-0">
+                            <div class="eg-empty-state">
+                                <div class="eg-empty-icon"><i class="bi bi-search"></i></div>
+                                <h6 class="fw-bold mb-1">Không tìm thấy sinh viên phù hợp</h6>
+                                <p class="text-muted small mb-3">Thử thay đổi từ khóa tìm kiếm hoặc đặt lại bộ lọc mức độ nguy cơ.</p>
+                                <a asp-controller="Students" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Xem tất cả sinh viên
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 }
@@ -75,27 +114,42 @@
                             <div class="fw-semibold">@sv.FullName</div>
                             <small class="text-muted">@sv.Email</small>
                         </td>
-                        <td><span class="badge bg-light text-dark border">@sv.ClassName</span></td>
+                        <td><span class="badge eg-badge-moderate">@sv.ClassName</span></td>
+                        <td>
+                            @{
+                                var attPct = (int)(sv.AttendanceRate * 100);
+                                var attBadgeClass = sv.IsExamBanRisk
+                                    ? "eg-badge-alert"
+                                    : (sv.AbsentSessions == 1 ? "eg-badge-moderate" : "eg-badge-normal");
+                            }
+                            <div class="d-flex flex-column">
+                                <span class="badge @attBadgeClass px-2 py-1">
+                                    <i class="bi @(sv.IsExamBanRisk ? "bi-calendar-x-fill" : "bi-calendar-check-fill") me-1"></i>
+                                    @sv.AttendedSessions/@sv.TotalSessions buổi (@attPct%)
+                                </span>
+                                @if (sv.IsExamBanRisk)
+                                {
+                                    <small class="text-danger fw-semibold mt-1" style="font-size: 0.72rem;">Vắng @sv.AbsentSessions/@sv.TotalSessions buổi (&gt;20% cấm thi)</small>
+                                }
+                                else if (sv.AbsentSessions == 1)
+                                {
+                                    <small class="text-muted mt-1" style="font-size: 0.72rem;">Đã vắng 1/@sv.TotalSessions buổi (Sát ngưỡng)</small>
+                                }
+                            </div>
+                        </td>
                         <td><span class="fw-semibold">@sv.GpaBefore.ToString("F2")</span></td>
                         <td>
-                            <span class="badge @(sv.TotalVleClicks < 150 ? "bg-danger-subtle text-danger" : "bg-light text-dark") border">
+                            <span class="badge @(sv.TotalVleClicks < 150 ? "eg-badge-alert" : "eg-badge-moderate")">
                                 @sv.TotalVleClicks clicks
                             </span>
                         </td>
                         <td>@((int)(sv.LateSubmissionRate * 100))%</td>
                         <td>
-                            <div class="d-flex align-items-center gap-2" style="min-width: 140px;">
-                                <div class="progress flex-grow-1" style="height: 6px;">
-                                    @{
-                                        string barColor = sv.RiskLevel switch {
-                                            GNN_EduGuard.Models.RiskLevel.HighRisk => "bg-danger",
-                                            GNN_EduGuard.Models.RiskLevel.Moderate => "bg-warning",
-                                            _ => "bg-success"
-                                        };
-                                    }
-                                    <div class="progress-bar @barColor" style="width: @((int)(sv.RiskProbability * 100))%"></div>
+                            <div class="d-flex align-items-center gap-2" style="min-width: 150px;">
+                                <div class="eg-risk-progress flex-grow-1">
+                                    <div class="eg-risk-progress-bar" style="width: @((int)(sv.RiskProbability * 100))%"></div>
                                 </div>
-                                <span class="fw-bold small">@((int)(sv.RiskProbability * 100))%</span>
+                                <span class="fw-bold small @(sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.HighRisk ? "text-danger" : "")">@((int)(sv.RiskProbability * 100))%</span>
                             </div>
                         </td>
                         <td>
@@ -114,7 +168,7 @@
                         </td>
                         <td class="text-end">
                             <a asp-action="Details" asp-route-id="@sv.Id" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye me-1"></i> Chi tiết & Giải thích
+                                <i class="bi bi-eye me-1"></i> Điểm danh & Giải thích
                             </a>
                         </td>
                     </tr>
@@ -123,3 +177,236 @@
         </table>
     </div>
 </div>
+
+
+
+<!-- Bulk Gmail Warning Modal (Clean UI/UX) -->
+<div class="modal fade" id="bulkEmailModal" tabindex="-1" aria-labelledby="bulkEmailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg overflow-hidden">
+            <form method="post" asp-controller="Students" asp-action="SendBulkWarningEmails" id="bulkEmailForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="search" value="@currentSearch" />
+                <input type="hidden" name="riskFilter" value="@currentFilter" />
+
+                <div class="modal-header bg-danger text-white py-3">
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0" id="bulkEmailModalLabel">
+                            <i class="bi bi-envelope-exclamation-fill me-2"></i>
+                            Gửi Gmail Cảnh báo Học vụ (@Model.Count sinh viên)
+                        </h5>
+                        <small class="opacity-75">Tự động cá nhân hóa tên, số liệu điểm danh &amp; nguy cơ cho từng sinh viên</small>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+
+                <div class="modal-body p-4" style="max-height: 72vh; overflow-y: auto;">
+                    <!-- Fixed Sender & Status Strip -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 p-3 rounded-3 bg-light border mb-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-white text-danger border p-2 rounded-circle">
+                                <i class="bi bi-google fs-6"></i>
+                            </span>
+                            <div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Gmail gửi đi (cố định)</div>
+                                <div class="fw-semibold">@(string.IsNullOrWhiteSpace(smtpEmail) ? "Chưa cấu hình trong .env" : smtpEmail)</div>
+                            </div>
+                        </div>
+                        <div>
+                            @if (!string.IsNullOrWhiteSpace(smtpEmail) && hasSmtpPassword)
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Sẵn sàng gửi trực tiếp
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Chưa nhập Smtp__AppPassword trong .env
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <!-- Left Column: Recipients & Optional Advisor Note -->
+                        <div class="col-lg-5 d-flex flex-column gap-3">
+                            <div>
+                                <label class="form-label fw-semibold small text-uppercase text-muted mb-2">
+                                    <i class="bi bi-people-fill me-1 text-primary"></i>
+                                    Danh sách người nhận (@Model.Count email đã đăng ký)
+                                </label>
+                                <div class="border rounded-3 bg-white" style="max-height: 230px; overflow-y: auto;">
+                                    <ul class="list-group list-group-flush">
+                                        @foreach (var sv in Model)
+                                        {
+                                            var riskPct = (int)Math.Round(sv.RiskProbability * 100);
+                                            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                                                <div class="text-truncate me-2">
+                                                    <div class="fw-semibold small text-truncate">@sv.FullName <span class="text-muted fw-normal">(@sv.StudentCode)</span></div>
+                                                    <div class="text-muted text-truncate" style="font-size: 0.76rem;">
+                                                        <i class="bi bi-envelope me-1"></i>@sv.Email
+                                                    </div>
+                                                </div>
+                                                <span class="badge rounded-pill @(sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.HighRisk ? "bg-danger-subtle text-danger" : (sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.Moderate ? "bg-warning-subtle text-warning-emphasis" : "bg-success-subtle text-success"))">
+                                                    @riskPct%
+                                                </span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="advisorNoteInput" class="form-label fw-semibold small text-uppercase text-muted mb-1">
+                                    <i class="bi bi-chat-left-text me-1 text-primary"></i>
+                                    Lời nhắn thêm của Cố vấn (Tùy chọn)
+                                </label>
+                                <textarea id="advisorNoteInput" name="advisorNote" class="form-control" rows="4"
+                                          placeholder="Ví dụ: Đề nghị các bạn sắp xếp gặp thầy/cô tại phòng A2.04 vào thứ 5 lúc 14h00 để trao đổi kế hoạch học tập..."></textarea>
+                                <div class="form-text" style="font-size: 0.75rem;">
+                                    Nếu nhập, lời nhắn này sẽ được chèn nổi bật vào email gửi tới tất cả sinh viên ở trên.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Live Email Preview -->
+                        <div class="col-lg-7">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                                <label class="form-label fw-semibold small text-uppercase text-muted mb-0">
+                                    <i class="bi bi-eye-fill me-1 text-primary"></i>
+                                    Xem trước nội dung email cá nhân hóa
+                                </label>
+                                <select id="previewStudentSelect" class="form-select form-select-sm w-auto">
+                                    @for (int i = 0; i < Model.Count; i++)
+                                    {
+                                        <option value="@i">@Model[i].StudentCode - @Model[i].FullName</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="border rounded-3 overflow-hidden bg-white shadow-sm">
+                                <div class="bg-danger text-white px-3 py-2 fw-semibold small">
+                                    Cảnh báo Học vụ &amp; Chuyên cần — GNN-EduGuard
+                                </div>
+                                <div class="px-3 py-2 border-bottom bg-light small">
+                                    <div><span class="text-muted">Đến:</span> <strong id="pvTo"></strong></div>
+                                    <div><span class="text-muted">Tiêu đề:</span> <strong id="pvSubject"></strong></div>
+                                </div>
+                                <div class="p-3 small" style="line-height: 1.55;">
+                                    <p class="mb-2">
+                                        Kính gửi sinh viên <strong id="pvName"></strong> (MSSV: <strong id="pvCode"></strong> - Lớp: <strong id="pvClass"></strong>),
+                                    </p>
+                                    <p class="mb-2">
+                                        Hệ thống Cảnh báo Sớm <strong>GNN-EduGuard</strong> ghi nhận tình hình học tập hiện tại của bạn đang ở mức:
+                                        <span id="pvRiskBadge" class="badge rounded-pill"></span>
+                                    </p>
+                                    <table class="table table-sm table-bordered mb-2" style="font-size: 0.8rem;">
+                                        <tbody>
+                                            <tr><td class="text-muted">Chuyên cần (Điểm danh)</td><td class="fw-semibold" id="pvAttendance"></td></tr>
+                                            <tr><td class="text-muted">GPA trước</td><td class="fw-semibold" id="pvGpa"></td></tr>
+                                            <tr><td class="text-muted">Tương tác học liệu VLE</td><td class="fw-semibold" id="pvClicks"></td></tr>
+                                            <tr><td class="text-muted">Tỷ lệ nộp bài muộn</td><td class="fw-semibold" id="pvLate"></td></tr>
+                                            <tr><td class="text-muted">Yếu tố rủi ro chính</td><td id="pvFactor"></td></tr>
+                                        </tbody>
+                                    </table>
+                                    <div id="pvNoteBox" class="p-2 rounded bg-primary-subtle border-start border-4 border-primary mb-2 d-none" style="font-size: 0.8rem;">
+                                        <strong class="text-primary-emphasis d-block">Lời nhắn từ Cố vấn Học tập:</strong>
+                                        <span id="pvNoteText" style="white-space: pre-wrap;"></span>
+                                    </div>
+                                    <div class="p-2 rounded bg-danger-subtle text-danger-emphasis mb-2" style="font-size: 0.76rem;">
+                                        <strong>Lưu ý quy chế:</strong> Sinh viên vắng quá 20% số buổi học sẽ có nguy cơ bị cấm thi cuối kỳ. Đề nghị bạn sớm liên hệ hoặc lên gặp Cố vấn Học tập để được hỗ trợ kịp thời.
+                                    </div>
+                                    <div class="text-muted" style="font-size: 0.76rem;">
+                                        Trân trọng,<br /><strong>Cố vấn Học tập - Hệ thống GNN-EduGuard</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-danger fw-semibold px-4" id="sendBulkEmailBtn">
+                        <i class="bi bi-send-fill me-1"></i> Gửi Gmail tới @Model.Count sinh viên
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const students = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(sv => new {
+                sv.FullName,
+                sv.StudentCode,
+                sv.Email,
+                sv.ClassName,
+                Attendance = $"{sv.AttendedSessions}/{sv.TotalSessions} buổi ({(int)Math.Round(sv.AttendanceRate * 100)}%), vắng {sv.AbsentSessions} buổi",
+                Gpa = sv.GpaBefore.ToString("F2"),
+                Clicks = $"{sv.TotalVleClicks} clicks",
+                Late = $"{(int)Math.Round(sv.LateSubmissionRate * 100)}%",
+                RiskPct = $"{(int)Math.Round(sv.RiskProbability * 100)}%",
+                RiskLevel = sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.HighRisk ? "Nguy cơ cao"
+                    : (sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.Moderate ? "Nguy cơ vừa" : "An toàn"),
+                RiskType = sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.HighRisk ? "bg-danger"
+                    : (sv.RiskLevel == GNN_EduGuard.Models.RiskLevel.Moderate ? "bg-warning text-dark" : "bg-success"),
+                TopFactor = string.IsNullOrWhiteSpace(sv.TopRiskFactor)
+                    ? "Cần theo dõi thêm chuyên cần và tiến độ học tập"
+                    : sv.TopRiskFactor
+            })));
+
+            const select = document.getElementById('previewStudentSelect');
+            const noteInput = document.getElementById('advisorNoteInput');
+            const form = document.getElementById('bulkEmailForm');
+            const submitBtn = document.getElementById('sendBulkEmailBtn');
+
+            function updatePreview() {
+                if (!students || !students.length) return;
+                const idx = parseInt(select?.value || '0', 10) || 0;
+                const s = students[idx] || students[0];
+
+                document.getElementById('pvTo').textContent = `${s.FullName} <${s.Email}>`;
+                document.getElementById('pvSubject').textContent = `[GNN-EduGuard] Cảnh báo Học vụ & Chuyên cần - ${s.FullName} (${s.StudentCode})`;
+                document.getElementById('pvName').textContent = s.FullName;
+                document.getElementById('pvCode').textContent = s.StudentCode;
+                document.getElementById('pvClass').textContent = s.ClassName;
+                document.getElementById('pvAttendance').textContent = s.Attendance;
+                document.getElementById('pvGpa').textContent = s.Gpa;
+                document.getElementById('pvClicks').textContent = s.Clicks;
+                document.getElementById('pvLate').textContent = s.Late;
+                document.getElementById('pvFactor').textContent = s.TopFactor;
+
+                const badge = document.getElementById('pvRiskBadge');
+                badge.className = `badge rounded-pill ${s.RiskType}`;
+                badge.textContent = `${s.RiskLevel} (${s.RiskPct})`;
+
+                const noteBox = document.getElementById('pvNoteBox');
+                const noteText = document.getElementById('pvNoteText');
+                const note = (noteInput?.value || '').trim();
+                if (note) {
+                    noteBox.classList.remove('d-none');
+                    noteText.textContent = note;
+                } else {
+                    noteBox.classList.add('d-none');
+                    noteText.textContent = '';
+                }
+            }
+
+            select?.addEventListener('change', updatePreview);
+            noteInput?.addEventListener('input', updatePreview);
+
+            form?.addEventListener('submit', () => {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang gửi Gmail...';
+                }
+            });
+
+            updatePreview();
+        })();
+    </script>
+}

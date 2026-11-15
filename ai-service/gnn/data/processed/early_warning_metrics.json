@@ -1,0 +1,47 @@
+{
+  "Week_2": {
+    "week": 2,
+    "label": "Tuần 2 (Rất sớm)",
+    "recall_risk": 0.7241,
+    "precision_risk": 0.84,
+    "f1_macro": 0.7222,
+    "f1_risk": 0.7778,
+    "auc_roc": 0.8125
+  },
+  "Week_4": {
+    "week": 4,
+    "label": "Tuần 4 (Sớm)",
+    "recall_risk": 0.8621,
+    "precision_risk": 0.8621,
+    "f1_macro": 0.806,
+    "f1_risk": 0.8621,
+    "auc_roc": 0.8858
+  },
+  "Week_8": {
+    "week": 8,
+    "label": "Tuần 8 (Giữa kỳ)",
+    "recall_risk": 0.8621,
+    "precision_risk": 0.9259,
+    "f1_macro": 0.8582,
+    "f1_risk": 0.8929,
+    "auc_roc": 0.9569
+  },
+  "Week_12": {
+    "week": 12,
+    "label": "Tuần 12 (Cuối kỳ)",
+    "recall_risk": 0.8966,
+    "precision_risk": 0.9286,
+    "f1_macro": 0.8804,
+    "f1_risk": 0.9123,
+    "auc_roc": 0.9634
+  },
+  "Week_16": {
+    "week": 16,
+    "label": "Tuần 16 (Toàn kỳ)",
+    "recall_risk": 1.0,
+    "precision_risk": 0.8788,
+    "f1_macro": 0.8963,
+    "f1_risk": 0.9355,
+    "auc_roc": 0.9892
+  }
+}

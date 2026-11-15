@@ -1,0 +1,296 @@
+{
+  "raw_dir": "C:\\DulieuoD\\DACN\\GNN-EduGuard\\ai-service\\gnn\\data\\raw",
+  "tables_before_cleaning": [
+    {
+      "table": "assessments",
+      "rows": 16,
+      "cols": 7,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "id_assessment",
+        "code_module",
+        "code_presentation",
+        "assessment_type",
+        "date",
+        "weight",
+        "concept_idx"
+      ]
+    },
+    {
+      "table": "courses",
+      "rows": 4,
+      "cols": 3,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "code_module",
+        "code_presentation",
+        "module_presentation_length"
+      ]
+    },
+    {
+      "table": "studentAssessment",
+      "rows": 879,
+      "cols": 5,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "id_assessment",
+        "id_student",
+        "date_submitted",
+        "is_banked",
+        "score"
+      ]
+    },
+    {
+      "table": "studentAttendance",
+      "rows": 2700,
+      "cols": 6,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "id_student",
+        "code_module",
+        "session_no",
+        "week",
+        "concept_idx",
+        "attended"
+      ]
+    },
+    {
+      "table": "studentInfo",
+      "rows": 300,
+      "cols": 12,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "id_student",
+        "code_module",
+        "code_presentation",
+        "gender",
+        "region",
+        "highest_education",
+        "imd_band",
+        "age_band",
+        "num_of_prev_attempts",
+        "studied_credits",
+        "disability",
+        "final_result"
+      ]
+    },
+    {
+      "table": "studentRegistration",
+      "rows": 300,
+      "cols": 5,
+      "missing_rows": 204,
+      "missing_cells": 204,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "code_module",
+        "code_presentation",
+        "id_student",
+        "date_registration",
+        "date_unregistration"
+      ]
+    },
+    {
+      "table": "studentVle",
+      "rows": 2200,
+      "cols": 6,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "code_module",
+        "code_presentation",
+        "id_student",
+        "id_site",
+        "date",
+        "sum_click"
+      ]
+    },
+    {
+      "table": "vle",
+      "rows": 72,
+      "cols": 7,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "id_site",
+        "code_module",
+        "code_presentation",
+        "activity_type",
+        "week_from",
+        "week_to",
+        "concept_idx"
+      ]
+    }
+  ],
+  "tables_after_cleaning": [
+    {
+      "table": "assessments",
+      "rows": 16,
+      "cols": 7,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "id_assessment",
+        "code_module",
+        "code_presentation",
+        "assessment_type",
+        "date",
+        "weight",
+        "concept_idx"
+      ]
+    },
+    {
+      "table": "courses",
+      "rows": 4,
+      "cols": 3,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "code_module",
+        "code_presentation",
+        "module_presentation_length"
+      ]
+    },
+    {
+      "table": "studentAssessment",
+      "rows": 879,
+      "cols": 5,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "id_assessment",
+        "id_student",
+        "date_submitted",
+        "is_banked",
+        "score"
+      ]
+    },
+    {
+      "table": "studentAttendance",
+      "rows": 2700,
+      "cols": 6,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "id_student",
+        "code_module",
+        "session_no",
+        "week",
+        "concept_idx",
+        "attended"
+      ]
+    },
+    {
+      "table": "studentInfo",
+      "rows": 300,
+      "cols": 12,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "id_student",
+        "code_module",
+        "code_presentation",
+        "gender",
+        "region",
+        "highest_education",
+        "imd_band",
+        "age_band",
+        "num_of_prev_attempts",
+        "studied_credits",
+        "disability",
+        "final_result"
+      ]
+    },
+    {
+      "table": "studentRegistration",
+      "rows": 300,
+      "cols": 5,
+      "missing_rows": 204,
+      "missing_cells": 204,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "code_module",
+        "code_presentation",
+        "id_student",
+        "date_registration",
+        "date_unregistration"
+      ]
+    },
+    {
+      "table": "studentVle",
+      "rows": 2200,
+      "cols": 6,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "code_module",
+        "code_presentation",
+        "id_student",
+        "id_site",
+        "date",
+        "sum_click"
+      ]
+    },
+    {
+      "table": "vle",
+      "rows": 72,
+      "cols": 7,
+      "missing_rows": 0,
+      "missing_cells": 0,
+      "duplicate_rows": 0,
+      "all_null_columns": [],
+      "columns": [
+        "id_site",
+        "code_module",
+        "code_presentation",
+        "activity_type",
+        "week_from",
+        "week_to",
+        "concept_idx"
+      ]
+    }
+  ],
+  "rows_removed": {
+    "assessments": 0,
+    "courses": 0,
+    "studentAssessment": 0,
+    "studentAttendance": 0,
+    "studentInfo": 0,
+    "studentRegistration": 0,
+    "studentVle": 0,
+    "vle": 0
+  },
+  "outlier_policy": "Right-skewed count features capped at P98 fitted on TRAIN split only"
+}
