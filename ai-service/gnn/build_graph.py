@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from torch_geometric.data import HeteroData
-from gnn.data_loader import OuladDataLoader
 from gnn.data_quality import clean_table, fit_outlier_caps
 
 RAW_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "data", "raw"))
@@ -36,14 +35,12 @@ def build_heterogeneous_graph(raw_dir: str = RAW_DIR, output_dir: str = PROCESSE
     courses_file = os.path.join(raw_dir, "courses.csv")
     students_file = os.path.join(raw_dir, "studentInfo.csv")
     attendance_file = os.path.join(raw_dir, "studentAttendance.csv")
-    if force_regen or not os.path.exists(courses_file) or not os.path.exists(attendance_file):
-        loader = OuladDataLoader(raw_dir)
-        loader.generate_synthetic_oulad_sample(300, 4)
-    else:
-        s_df_check = pd.read_csv(students_file)
-        if len(s_df_check) < 250:
-            loader = OuladDataLoader(raw_dir)
-            loader.generate_synthetic_oulad_sample(300, 4)
+    required = ("courses.csv", "vle.csv", "assessments.csv", "studentInfo.csv",
+                "studentRegistration.csv", "studentAssessment.csv", "studentVle.csv",
+                "studentAttendance.csv")
+    missing = [name for name in required if not os.path.isfile(os.path.join(raw_dir, name))]
+    if missing:
+        raise FileNotFoundError(f"Missing raw CSVs: {', '.join(missing)}")
 
     # Load tables
     courses_df = pd.read_csv(os.path.join(raw_dir, "courses.csv"))

@@ -103,8 +103,7 @@ class StudentRiskExplainer:
             exact = self.student_df[self.student_df["id_student"] == student_id]
             if len(exact) > 0:
                 return int(exact.iloc[0]["node_idx"])
-        num_nodes = self.graph_data["student"].num_nodes if self.graph_data is not None else 300
-        return max(0, min(num_nodes - 1, student_id - 1))
+        raise ValueError(f"Unknown student_id: {student_id}")
 
     def update_attendance_in_memory(self, student_id: int, attended_sessions: int, total_sessions: int = 9):
         """

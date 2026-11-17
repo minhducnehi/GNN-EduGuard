@@ -41,13 +41,16 @@ namespace GNN_EduGuard.Controllers.Api
         public async Task<IActionResult> GetStudents([FromQuery] string? search, [FromQuery] RiskLevel? riskFilter)
         {
             var students = await _studentService.GetAllStudentsAsync(search, riskFilter);
-            return Ok(students);
+            return Ok(User.FilterByRoleScope(students));
         }
 
         // GET: api/predictionsapi/students/1
         [HttpGet("students/{id}")]
         public async Task<IActionResult> GetStudentDetail(int id)
         {
+            var student = await _studentService.GetStudentByIdAsync(id);
+            if (student == null) return NotFound();
+            if (!User.CanAccessStudent(student)) return Forbid();
             var detail = await _studentService.GetStudentRiskDetailAsync(id);
             if (detail == null) return NotFound(new { message = $"Không tìm thấy sinh viên ID {id}" });
             return Ok(detail);
@@ -58,6 +61,9 @@ namespace GNN_EduGuard.Controllers.Api
         public async Task<IActionResult> ConsultStudentWithAgent(int id)
         {
             var student = await _studentService.GetStudentByIdAsync(id);
+            if (student == null) return NotFound();
+            if (!User.IsInRole("Admin") && !User.IsInRole("Advisor")) return Forbid();
+            if (!User.CanAccessStudent(student)) return Forbid();
             var payload = student != null ? new
             {
                 student_id = id,

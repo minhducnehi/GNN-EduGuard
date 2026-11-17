@@ -57,3 +57,8 @@ def test_attendance_update_changes_risk():
 def test_attendance_validation():
     r = client.post("/api/predict/attendance/5", json={"attended_sessions": -1, "total_sessions": 9})
     assert r.status_code == 422
+
+
+@pytest.mark.parametrize("path", ["/api/predict/risk/999999", "/api/explain/999999"])
+def test_unknown_student_is_not_mapped_to_another_student(path):
+    assert client.get(path).status_code == 404

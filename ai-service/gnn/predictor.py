@@ -20,6 +20,9 @@ class StudentRiskPredictor:
         self._load_artifacts()
 
     def _load_artifacts(self):
+        self.model = None
+        self.graph_data = None
+        self.explainer = None
         graph_path = os.path.join(PROCESSED_DIR, "graph.pt")
         ckpt_path = os.path.join(MODELS_DIR, "best_hgt_model.pt")
         features_csv = os.path.join(PROCESSED_DIR, "student_features.csv")
@@ -188,18 +191,4 @@ class StudentRiskPredictor:
                 "early_warning_trajectory": xai_report.get("early_warning_trajectory", [])
             }
 
-        return {
-            "student_id": student_id,
-            "model_used": "Heuristic Baseline",
-            "name": f"Sinh viên #{student_id}",
-            "gpa": 1.65,
-            "attendance_rate": 0.667,
-            "attended_sessions": 10,
-            "total_sessions": 15,
-            "absent_sessions": 5,
-            "submission_rate": "50%",
-            "risk_score": 0.78,
-            "risk_level": "High",
-            "reasons": ["Chưa tải được trọng số mô hình HGT"],
-            "weak_concepts": ["Đệ quy & Quy nạp (Recursion)"]
-        }
+        raise RuntimeError("GNN model artifacts are unavailable; prediction cannot be produced")

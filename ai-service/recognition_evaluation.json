@@ -1,0 +1,624 @@
+{
+  "data_source": "repository synthetic OULAD-schema sample",
+  "test_n": 45,
+  "models": {
+    "static": {
+      "n": 45,
+      "positive_count": 29,
+      "precision": 0.9285714285714286,
+      "recall": 0.896551724137931,
+      "brier": 0.10035504400730133,
+      "mean_predicted_risk": 0.5355930924415588,
+      "observed_risk": 0.6444444444444445,
+      "roc_auc": 0.9741379310344828,
+      "threshold": 0.41,
+      "recall_95pct_bootstrap_ci": [
+        0.7741244239631336,
+        1.0
+      ],
+      "subgroups": {
+        "gender_code": {
+          "0.0": {
+            "n": 17,
+            "positive_count": 10,
+            "precision": 1.0,
+            "recall": 1.0,
+            "brier": 0.05275968462228775,
+            "mean_predicted_risk": 0.549280047416687,
+            "observed_risk": 0.5882352941176471,
+            "roc_auc": 1.0
+          },
+          "1.0": {
+            "n": 28,
+            "positive_count": 19,
+            "precision": 0.8888888888888888,
+            "recall": 0.8421052631578947,
+            "brier": 0.12925221025943756,
+            "mean_predicted_risk": 0.527283251285553,
+            "observed_risk": 0.6785714285714286,
+            "roc_auc": 0.9532163742690059
+          }
+        },
+        "code_module": {
+          "CS101": {
+            "n": 7,
+            "positive_count": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "brier": 0.14545606076717377,
+            "mean_predicted_risk": 0.2617834508419037,
+            "observed_risk": 0.14285714285714285,
+            "roc_auc": 0.6666666666666667
+          },
+          "CS201": {
+            "n": 10,
+            "positive_count": 7,
+            "precision": 1.0,
+            "recall": 0.8571428571428571,
+            "brier": 0.10456795990467072,
+            "mean_predicted_risk": 0.549900472164154,
+            "observed_risk": 0.7,
+            "roc_auc": 1.0
+          },
+          "CS301": {
+            "n": 17,
+            "positive_count": 12,
+            "precision": 1.0,
+            "recall": 1.0,
+            "brier": 0.06445395201444626,
+            "mean_predicted_risk": 0.6225830316543579,
+            "observed_risk": 0.7058823529411765,
+            "roc_auc": 1.0
+          },
+          "CS401": {
+            "n": 11,
+            "positive_count": 9,
+            "precision": 1.0,
+            "recall": 0.8888888888888888,
+            "brier": 0.12330795079469681,
+            "mean_predicted_risk": 0.5623902082443237,
+            "observed_risk": 0.8181818181818182,
+            "roc_auc": 1.0
+          }
+        }
+      },
+      "outcomes": {
+        "Distinction": {
+          "n": 1,
+          "flagged_count": 0,
+          "flagged_rate": 0.0
+        },
+        "Fail": {
+          "n": 15,
+          "flagged_count": 13,
+          "flagged_rate": 0.8666666666666667
+        },
+        "Pass": {
+          "n": 15,
+          "flagged_count": 2,
+          "flagged_rate": 0.13333333333333333
+        },
+        "Withdrawn": {
+          "n": 14,
+          "flagged_count": 13,
+          "flagged_rate": 0.9285714285714286
+        }
+      }
+    },
+    "week_2": {
+      "n": 45,
+      "positive_count": 29,
+      "precision": 0.8518518518518519,
+      "recall": 0.7931034482758621,
+      "brier": 0.18549999594688416,
+      "mean_predicted_risk": 0.5512281060218811,
+      "observed_risk": 0.6444444444444445,
+      "roc_auc": 0.8125,
+      "threshold": 0.48,
+      "recall_95pct_bootstrap_ci": [
+        0.64,
+        0.9285714285714286
+      ],
+      "subgroups": {
+        "gender_code": {
+          "0.0": {
+            "n": 17,
+            "positive_count": 10,
+            "precision": 0.8888888888888888,
+            "recall": 0.8,
+            "brier": 0.17093439400196075,
+            "mean_predicted_risk": 0.5163416862487793,
+            "observed_risk": 0.5882352941176471,
+            "roc_auc": 0.9142857142857144
+          },
+          "1.0": {
+            "n": 28,
+            "positive_count": 19,
+            "precision": 0.8333333333333334,
+            "recall": 0.7894736842105263,
+            "brier": 0.1943434178829193,
+            "mean_predicted_risk": 0.5724090337753296,
+            "observed_risk": 0.6785714285714286,
+            "roc_auc": 0.7485380116959065
+          }
+        },
+        "code_module": {
+          "CS101": {
+            "n": 7,
+            "positive_count": 1,
+            "precision": 0.3333333333333333,
+            "recall": 1.0,
+            "brier": 0.23336635529994965,
+            "mean_predicted_risk": 0.5213069915771484,
+            "observed_risk": 0.14285714285714285,
+            "roc_auc": 0.8333333333333334
+          },
+          "CS201": {
+            "n": 10,
+            "positive_count": 7,
+            "precision": 0.8333333333333334,
+            "recall": 0.7142857142857143,
+            "brier": 0.2089952677488327,
+            "mean_predicted_risk": 0.5413731336593628,
+            "observed_risk": 0.7,
+            "roc_auc": 0.7142857142857143
+          },
+          "CS301": {
+            "n": 17,
+            "positive_count": 12,
+            "precision": 0.9090909090909091,
+            "recall": 0.8333333333333334,
+            "brier": 0.16495771706104279,
+            "mean_predicted_risk": 0.5579827427864075,
+            "observed_risk": 0.7058823529411765,
+            "roc_auc": 0.8666666666666667
+          },
+          "CS401": {
+            "n": 11,
+            "positive_count": 9,
+            "precision": 1.0,
+            "recall": 0.7777777777777778,
+            "brier": 0.16542744636535645,
+            "mean_predicted_risk": 0.5687887072563171,
+            "observed_risk": 0.8181818181818182,
+            "roc_auc": 0.9444444444444444
+          }
+        }
+      },
+      "outcomes": {
+        "Distinction": {
+          "n": 1,
+          "flagged_count": 0,
+          "flagged_rate": 0.0
+        },
+        "Fail": {
+          "n": 15,
+          "flagged_count": 12,
+          "flagged_rate": 0.8
+        },
+        "Pass": {
+          "n": 15,
+          "flagged_count": 4,
+          "flagged_rate": 0.26666666666666666
+        },
+        "Withdrawn": {
+          "n": 14,
+          "flagged_count": 11,
+          "flagged_rate": 0.7857142857142857
+        }
+      }
+    },
+    "week_4": {
+      "n": 45,
+      "positive_count": 29,
+      "precision": 0.8620689655172413,
+      "recall": 0.8620689655172413,
+      "brier": 0.14785903692245483,
+      "mean_predicted_risk": 0.5859882831573486,
+      "observed_risk": 0.6444444444444445,
+      "roc_auc": 0.8857758620689655,
+      "threshold": 0.48,
+      "recall_95pct_bootstrap_ci": [
+        0.7241379310344828,
+        0.967741935483871
+      ],
+      "subgroups": {
+        "gender_code": {
+          "0.0": {
+            "n": 17,
+            "positive_count": 10,
+            "precision": 0.9090909090909091,
+            "recall": 1.0,
+            "brier": 0.1298716962337494,
+            "mean_predicted_risk": 0.559036374092102,
+            "observed_risk": 0.5882352941176471,
+            "roc_auc": 0.9714285714285715
+          },
+          "1.0": {
+            "n": 28,
+            "positive_count": 19,
+            "precision": 0.8333333333333334,
+            "recall": 0.7894736842105263,
+            "brier": 0.15877993404865265,
+            "mean_predicted_risk": 0.60235196352005,
+            "observed_risk": 0.6785714285714286,
+            "roc_auc": 0.8362573099415206
+          }
+        },
+        "code_module": {
+          "CS101": {
+            "n": 7,
+            "positive_count": 1,
+            "precision": 0.3333333333333333,
+            "recall": 1.0,
+            "brier": 0.20529116690158844,
+            "mean_predicted_risk": 0.5067351460456848,
+            "observed_risk": 0.14285714285714285,
+            "roc_auc": 1.0
+          },
+          "CS201": {
+            "n": 10,
+            "positive_count": 7,
+            "precision": 0.8571428571428571,
+            "recall": 0.8571428571428571,
+            "brier": 0.14732874929904938,
+            "mean_predicted_risk": 0.5875434279441833,
+            "observed_risk": 0.7,
+            "roc_auc": 0.8571428571428572
+          },
+          "CS301": {
+            "n": 17,
+            "positive_count": 12,
+            "precision": 0.9166666666666666,
+            "recall": 0.9166666666666666,
+            "brier": 0.1280575841665268,
+            "mean_predicted_risk": 0.6033663153648376,
+            "observed_risk": 0.7058823529411765,
+            "roc_auc": 0.9333333333333333
+          },
+          "CS401": {
+            "n": 11,
+            "positive_count": 9,
+            "precision": 1.0,
+            "recall": 0.7777777777777778,
+            "brier": 0.14239569008350372,
+            "mean_predicted_risk": 0.6081512570381165,
+            "observed_risk": 0.8181818181818182,
+            "roc_auc": 0.9444444444444444
+          }
+        }
+      },
+      "outcomes": {
+        "Distinction": {
+          "n": 1,
+          "flagged_count": 0,
+          "flagged_rate": 0.0
+        },
+        "Fail": {
+          "n": 15,
+          "flagged_count": 13,
+          "flagged_rate": 0.8666666666666667
+        },
+        "Pass": {
+          "n": 15,
+          "flagged_count": 4,
+          "flagged_rate": 0.26666666666666666
+        },
+        "Withdrawn": {
+          "n": 14,
+          "flagged_count": 12,
+          "flagged_rate": 0.8571428571428571
+        }
+      }
+    },
+    "week_8": {
+      "n": 45,
+      "positive_count": 29,
+      "precision": 0.896551724137931,
+      "recall": 0.896551724137931,
+      "brier": 0.10978779196739197,
+      "mean_predicted_risk": 0.589103639125824,
+      "observed_risk": 0.6444444444444445,
+      "roc_auc": 0.9568965517241379,
+      "threshold": 0.48,
+      "recall_95pct_bootstrap_ci": [
+        0.7727272727272727,
+        1.0
+      ],
+      "subgroups": {
+        "gender_code": {
+          "0.0": {
+            "n": 17,
+            "positive_count": 10,
+            "precision": 1.0,
+            "recall": 0.9,
+            "brier": 0.08762452751398087,
+            "mean_predicted_risk": 0.5659273266792297,
+            "observed_risk": 0.5882352941176471,
+            "roc_auc": 1.0
+          },
+          "1.0": {
+            "n": 28,
+            "positive_count": 19,
+            "precision": 0.85,
+            "recall": 0.8947368421052632,
+            "brier": 0.12324406951665878,
+            "mean_predicted_risk": 0.6031748652458191,
+            "observed_risk": 0.6785714285714286,
+            "roc_auc": 0.9298245614035088
+          }
+        },
+        "code_module": {
+          "CS101": {
+            "n": 7,
+            "positive_count": 1,
+            "precision": 0.3333333333333333,
+            "recall": 1.0,
+            "brier": 0.15365879237651825,
+            "mean_predicted_risk": 0.420619398355484,
+            "observed_risk": 0.14285714285714285,
+            "roc_auc": 1.0
+          },
+          "CS201": {
+            "n": 10,
+            "positive_count": 7,
+            "precision": 0.875,
+            "recall": 1.0,
+            "brier": 0.09550733864307404,
+            "mean_predicted_risk": 0.6470579504966736,
+            "observed_risk": 0.7,
+            "roc_auc": 0.9523809523809524
+          },
+          "CS301": {
+            "n": 17,
+            "positive_count": 12,
+            "precision": 1.0,
+            "recall": 0.9166666666666666,
+            "brier": 0.08526497334241867,
+            "mean_predicted_risk": 0.6271618604660034,
+            "observed_risk": 0.7058823529411765,
+            "roc_auc": 1.0
+          },
+          "CS401": {
+            "n": 11,
+            "positive_count": 9,
+            "precision": 1.0,
+            "recall": 0.7777777777777778,
+            "brier": 0.13275106251239777,
+            "mean_predicted_risk": 0.58481764793396,
+            "observed_risk": 0.8181818181818182,
+            "roc_auc": 1.0
+          }
+        }
+      },
+      "outcomes": {
+        "Distinction": {
+          "n": 1,
+          "flagged_count": 0,
+          "flagged_rate": 0.0
+        },
+        "Fail": {
+          "n": 15,
+          "flagged_count": 14,
+          "flagged_rate": 0.9333333333333333
+        },
+        "Pass": {
+          "n": 15,
+          "flagged_count": 3,
+          "flagged_rate": 0.2
+        },
+        "Withdrawn": {
+          "n": 14,
+          "flagged_count": 12,
+          "flagged_rate": 0.8571428571428571
+        }
+      }
+    },
+    "week_12": {
+      "n": 45,
+      "positive_count": 29,
+      "precision": 0.9,
+      "recall": 0.9310344827586207,
+      "brier": 0.0969218984246254,
+      "mean_predicted_risk": 0.6076986789703369,
+      "observed_risk": 0.6444444444444445,
+      "roc_auc": 0.9633620689655172,
+      "threshold": 0.48,
+      "recall_95pct_bootstrap_ci": [
+        0.8275862068965517,
+        1.0
+      ],
+      "subgroups": {
+        "gender_code": {
+          "0.0": {
+            "n": 17,
+            "positive_count": 10,
+            "precision": 1.0,
+            "recall": 0.9,
+            "brier": 0.07696712762117386,
+            "mean_predicted_risk": 0.588074266910553,
+            "observed_risk": 0.5882352941176471,
+            "roc_auc": 0.9857142857142858
+          },
+          "1.0": {
+            "n": 28,
+            "positive_count": 19,
+            "precision": 0.8571428571428571,
+            "recall": 0.9473684210526315,
+            "brier": 0.10903729498386383,
+            "mean_predicted_risk": 0.6196134686470032,
+            "observed_risk": 0.6785714285714286,
+            "roc_auc": 0.9473684210526315
+          }
+        },
+        "code_module": {
+          "CS101": {
+            "n": 7,
+            "positive_count": 1,
+            "precision": 0.3333333333333333,
+            "recall": 1.0,
+            "brier": 0.16353048384189606,
+            "mean_predicted_risk": 0.41043540835380554,
+            "observed_risk": 0.14285714285714285,
+            "roc_auc": 1.0
+          },
+          "CS201": {
+            "n": 10,
+            "positive_count": 7,
+            "precision": 0.875,
+            "recall": 1.0,
+            "brier": 0.07587958872318268,
+            "mean_predicted_risk": 0.6620251536369324,
+            "observed_risk": 0.7,
+            "roc_auc": 0.9523809523809524
+          },
+          "CS301": {
+            "n": 17,
+            "positive_count": 12,
+            "precision": 1.0,
+            "recall": 1.0,
+            "brier": 0.06898416578769684,
+            "mean_predicted_risk": 0.6564475893974304,
+            "observed_risk": 0.7058823529411765,
+            "roc_auc": 1.0
+          },
+          "CS401": {
+            "n": 11,
+            "positive_count": 9,
+            "precision": 1.0,
+            "recall": 0.7777777777777778,
+            "brier": 0.11684047430753708,
+            "mean_predicted_risk": 0.6085028052330017,
+            "observed_risk": 0.8181818181818182,
+            "roc_auc": 1.0
+          }
+        }
+      },
+      "outcomes": {
+        "Distinction": {
+          "n": 1,
+          "flagged_count": 0,
+          "flagged_rate": 0.0
+        },
+        "Fail": {
+          "n": 15,
+          "flagged_count": 15,
+          "flagged_rate": 1.0
+        },
+        "Pass": {
+          "n": 15,
+          "flagged_count": 3,
+          "flagged_rate": 0.2
+        },
+        "Withdrawn": {
+          "n": 14,
+          "flagged_count": 12,
+          "flagged_rate": 0.8571428571428571
+        }
+      }
+    },
+    "week_16": {
+      "n": 45,
+      "positive_count": 29,
+      "precision": 0.8787878787878788,
+      "recall": 1.0,
+      "brier": 0.08000069111585617,
+      "mean_predicted_risk": 0.6588147282600403,
+      "observed_risk": 0.6444444444444445,
+      "roc_auc": 0.9892241379310345,
+      "threshold": 0.48,
+      "recall_95pct_bootstrap_ci": [
+        1.0,
+        1.0
+      ],
+      "subgroups": {
+        "gender_code": {
+          "0.0": {
+            "n": 17,
+            "positive_count": 10,
+            "precision": 0.9090909090909091,
+            "recall": 1.0,
+            "brier": 0.07132969796657562,
+            "mean_predicted_risk": 0.6331102252006531,
+            "observed_risk": 0.5882352941176471,
+            "roc_auc": 1.0
+          },
+          "1.0": {
+            "n": 28,
+            "positive_count": 19,
+            "precision": 0.8636363636363636,
+            "recall": 1.0,
+            "brier": 0.08526521921157837,
+            "mean_predicted_risk": 0.6744211912155151,
+            "observed_risk": 0.6785714285714286,
+            "roc_auc": 0.9824561403508771
+          }
+        },
+        "code_module": {
+          "CS101": {
+            "n": 7,
+            "positive_count": 1,
+            "precision": 0.3333333333333333,
+            "recall": 1.0,
+            "brier": 0.18572954833507538,
+            "mean_predicted_risk": 0.45393720269203186,
+            "observed_risk": 0.14285714285714285,
+            "roc_auc": 1.0
+          },
+          "CS201": {
+            "n": 10,
+            "positive_count": 7,
+            "precision": 0.875,
+            "recall": 1.0,
+            "brier": 0.06902043521404266,
+            "mean_predicted_risk": 0.7004438638687134,
+            "observed_risk": 0.7,
+            "roc_auc": 1.0
+          },
+          "CS301": {
+            "n": 17,
+            "positive_count": 12,
+            "precision": 0.9230769230769231,
+            "recall": 1.0,
+            "brier": 0.05795621871948242,
+            "mean_predicted_risk": 0.6982894539833069,
+            "observed_risk": 0.7058823529411765,
+            "roc_auc": 1.0
+          },
+          "CS401": {
+            "n": 11,
+            "positive_count": 9,
+            "precision": 1.0,
+            "recall": 1.0,
+            "brier": 0.05676945298910141,
+            "mean_predicted_risk": 0.6903404593467712,
+            "observed_risk": 0.8181818181818182,
+            "roc_auc": 1.0
+          }
+        }
+      },
+      "outcomes": {
+        "Distinction": {
+          "n": 1,
+          "flagged_count": 0,
+          "flagged_rate": 0.0
+        },
+        "Fail": {
+          "n": 15,
+          "flagged_count": 15,
+          "flagged_rate": 1.0
+        },
+        "Pass": {
+          "n": 15,
+          "flagged_count": 4,
+          "flagged_rate": 0.26666666666666666
+        },
+        "Withdrawn": {
+          "n": 14,
+          "flagged_count": 14,
+          "flagged_rate": 1.0
+        }
+      }
+    }
+  }
+}

@@ -85,31 +85,49 @@ class ConsultRequest(BaseModel):
 @app.get("/api/health")
 def health_check():
     return {
-        "status": "online",
+        "status": "online" if predictor.model is not None else "degraded",
         "service": "GNN-EduGuard AI Engine",
         "rag_chunks": vector_store.get_stats().get("total_chunks", 0),
         "ollama_model": agent.model
     }
 
+@app.get("/api/ready")
+def readiness_check():
+    if predictor.model is None or predictor.graph_data is None or predictor.student_df is None:
+        raise HTTPException(status_code=503, detail="GNN model artifacts are unavailable")
+    return {"status": "ready"}
+
 @app.get("/api/predict/risk/{student_id}")
 def predict_student_risk(student_id: int, refresh: bool = False):
     """Predict risk score, risk level and cached XAI explanation (including Attendance) for a given student ID."""
-    return predictor.predict_risk(student_id, force_refresh=refresh)
+    try:
+        return predictor.predict_risk(student_id, force_refresh=refresh)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 @app.post("/api/predict/re-evaluate/{student_id}")
 def re_evaluate_student_risk(student_id: int):
     """Invalidate XAI cache for student_id and run fresh GNN + Temporal HGT inference."""
-    return predictor.predict_risk(student_id, force_refresh=True)
+    try:
+        return predictor.predict_risk(student_id, force_refresh=True)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 @app.post("/api/predict/attendance/{student_id}")
 def update_student_attendance(student_id: int, req: AttendanceUpdateRequest):
     """Update student's class attendance record on the GNN graph and recalculate risk score & XAI attributions."""
-    return predictor.update_attendance_and_predict(student_id, req.attended_sessions, req.total_sessions)
+    try:
+        return predictor.update_attendance_and_predict(student_id, req.attended_sessions, req.total_sessions)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 @app.get("/api/explain/{student_id}")
 def explain_student_risk(student_id: int, refresh: bool = False):
     """Return full XAI Feature Attributions, Subgraph Edge Perturbations & Weekly Trajectory."""
-    return predictor.explain_student(student_id, force_refresh=refresh)
+    try:
+        return predictor.explain_student(student_id, force_refresh=refresh)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 @app.post("/api/agent/consult/{student_id}")
 def consult_student(student_id: int, req: Optional[ConsultRequest] = None):
